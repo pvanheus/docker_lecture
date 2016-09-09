@@ -4,10 +4,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Advanced Operating Systems: Docker</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/sky.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -24,8 +24,120 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section><h2>Docker (and HPC)</h2>
+				<p>Peter van Heusden (pvh@sanbi.ac.za) and Eugene de Beste, SANBI</p></section>
+				<section>
+					<h2>"The trick is to build a fast system" - Seymour Cray</h2>
+				</section>
+				<section><p>Reminder: High Performance Computing means optimising the <em>whole</em> computing system.</p>
+				<p>Remember <strong>Amdahl's Law</strong>: the theoretical speedup of a task is always limited by the part of the task that cannot benefit from the improvement.</p>
+			</section>
+			<section>
+				<p>"We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil." - Tony Hoare</p>
+			</section>
+			<section>
+				<img style="width: 80%" src="images/gatk_germline.png" alt="Variant calling pipeline. Image source: https://github.com/common-workflow-language/workflows/tree/h3abionet-gatk-workflow/workflows/GATK" />
+				<p class="fragment">Solve it in a way that is portable and can be adapted as software changes <span class="fragment">with a handful of developers</span></p>
+			</section>
+			<section>
+				<pre>
+					<code class="yaml">
+class: Workflow
+cwlVersion: v1.0
+
+inputs:
+  reference:
+    type: File
+    doc: reference human genome file
+
+steps:
+
+  create-dict:
+    run: ../../tools/picard-CreateSequenceDictionary.cwl
+    in:
+      reference: reference
+      outputFileName: output_RefDictionaryFile
+      tmpdir: tmpdir
+out: [ createDict_output ]
+					</code>
+				</pre>
+				<p>From <a href="https://github.com/common-workflow-language/workflows/tree/h3abionet-gatk-workflow/workflows/GATK">CWL GATK workflow</a></p>
+			</section>
+			<section>
+				<ul>
+					<li>Virtualisation is a key tool in modern computing infrastructure for:</li>
+					<ul>
+						<li>Scalability</li>
+						<li>Density (high utilisation)</li>
+						<li>Security</li>
+					</ul>
+					<li class="fragment">Hypervisor based virtualisation achieves this at the cost of performance</li>
+				</ul>
+			</section>
+			<section>
+				<img style="width: 90%" src="images/hypervisors_and_containers.png" alt="Hypervisors vs Containers, original source unknown" />
+			</section>
+			<section>
+				<ul>
+					<li>Docker container isolation based on control groups (cgroups) and namespaces</li>
+					<li class="fragment">Access to hardware is, in general, through same kernel interfaces as normal userspace code</li>
+					<li class="fragment">Benefits from technology (e.g. Open vSwitch) designed to expose hardware virtualisation support</li>
+					<li class="fragment">Device nodes can be exported to container (but: <strong>security?</strong>)</li>
+				</ul>
+			</section>
+			<section>
+				<pre><code class="bash" data-trim>
+				pvh@gabber:~$ docker run hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+
+c04b14da8d14: Pull complete
+Digest: sha256:0256e8a36e2070f7bf2d0b0763dbabdd67798512411de4cdcf9431a1feb60fd9
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+				</code></pre>
+			</section>
+			<section>
+				<p>Things to explore:
+				<ul>
+					<li class="fragment">Where are my processes?</li>
+					<li class="fragment">Docker networking</li>
+					<li class="fragment">Linux images: <em>ubuntu</em> and <em>alpine</em></li>
+					<li class="fragment">Interactive containers <em>run -it</em></li>
+				</ul>
+			</section>
+			<section>
+				<ul>
+					<li>Containers are built from images that themselves are built based on specification called Dockerfiles.</li>
+					<li class="fragment">The <em>Dockerfile</em> constains commands and other specifications that describe how the image needs to be constructed.</li>
+					<li class="fragment">Each Dockerfile is itself built off another <em>base image</em>, resulting in a <em>layered</em> approach that facilitates re-use.</li>
+					<li class="fragment">Images can be hosted on Dockerhub or Quay.Io</li>
+				</ul>
+			</section>
+			<section>
+				<pre>
+					<code data-trim>
+FROM quay.io/refgenomics/docker-ubuntu:14.04
+
+MAINTAINER Nik Krumm &lt;nkrumm@gmail.com&gt;
+
+RUN git clone https://github.com/lh3/bwa && \
+	cd bwa && \
+	git checkout 0.7.10 &&  \
+	make && cp bwa /usr/local/bin/bwa
+
+RUN apt-get install -y samtools
+
+# Convenience commands
+ADD align.py /usr/local/bin/align.py
+RUN chmod +x /usr/local/bin/align.py
+RUN ln -s /usr/local/bin/align.py /usr/local/bin/align
+CMD ["/usr/local/bin/align"]
+					</code>
+				</pre>
+				<p>From: <a href="https://github.com/onecodex/docker-bwa">onecodex/docker-bwa</a></p>
+			</section>
 			</div>
 		</div>
 
