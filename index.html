@@ -138,11 +138,71 @@ CMD ["/usr/local/bin/align"]
 				</pre>
 				<p>From: <a href="https://github.com/onecodex/docker-bwa">onecodex/docker-bwa</a></p>
 			</section>
+
+			<section>
+				<h4>Docker images and repositories</h4>
+				<p>Docker images are built using the <em>docker build</em> command
+				with a reference to the path containing the Dockerfile. Images
+			  can optionally be pushed to DockerHub using the <em>push</em>
+			  command.</p>
+				<pre>
+					<code data-trim>
+$ docker build -t pvanheus/aligntool:latest .
+
+$ docker push pvanheus/aligntool:latest
+					</code>
+				</pre>
+			</section>
+
+			<section>
+				<h4>The Quay.Io repository</h4>
+				<p>The DockerHub is run by Docker, Inc. but alternative repositories
+					exist, most notably <a href="https://quay.io">quay.io</a>. Quay is
+					notable for having a powerful API and thus allowing for integration
+					in automated workflows.</p>
+					<p>It also supports Github integration.</p>
+			</section>
+
+			<section>
+				<h4>Containers beyond Docker</h4>
+				<ul>
+					<li>Docker is by far the most popular container solution, however...</li>
+					<li class="fragment">Concerns exist about Docker security and root escalation</li>
+					<li class="fragment">Multi user environments like HPC clusters are loathe to install Docker</li>
+					<li class="fragment">Thus: <em>Singularity</em> (and <em>Rocket</em>)</li>
+				</ul>
+			</section>
+
+			<section>
+				<h4>Singularity</h4>
+				<ul>
+					<li><a href="http://singularity.lbl.gov">Singularity</a> emerged out of Lawrence Berkeley Labs</li>
+					<li class="fragment">Targetted at HPC community</li>
+					<li class="fragment">Images are file based</li>
+					<li class="fragment">Can build images from scratch or import from Docker</li>
+					<li class="fragment">Minimises use of root</li>
+					<li class="fragment">Run as user: no privileged operations</li>
+			</section>
+
+			<section>
+				<h4>Assignment</h4>
+				<ul>
+					<li>Dockerize your own software</li>
+					<li class="fragment">Either choose your Honours project or ask Peter for software</li>
+					<li class="fragment">Write Dockerfile build image</li>
+					<li class="fragment">Use EXPOSE for ports and VOLUME for volumes</li>
+					<li class="fragment">Publish image on Docker Hub or Quay.Io</li>
+					<li class="fragment">Convert your Docker image for use with Singularity</li>
+					<li class="fragment">or explain why Singularity cannot be used for your project</li>
+					<li class="fragment">Send README describing software and how to run it to Peter &lt;pvh@sanbi.ac.za&gt;</li>
+				</ul>
+			</section>
+			<script src="lib/js/head.min.js"></script>
+			<script src="js/reveal.js"></script>
+
+
 			</div>
 		</div>
-
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
 
 		<script>
 			// More info https://github.com/hakimel/reveal.js#configuration
